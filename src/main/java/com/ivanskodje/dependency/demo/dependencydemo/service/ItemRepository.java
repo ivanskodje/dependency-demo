@@ -9,4 +9,6 @@ public interface ItemRepository {
     List<Item> findItems();
 
     void saveItem(Item item);
+
+    void deleteAll();
 }

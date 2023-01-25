@@ -5,10 +5,12 @@ import com.ivanskodje.dependency.demo.dependencydemo.repository.jpa.converter.It
 import com.ivanskodje.dependency.demo.dependencydemo.repository.jpa.converter.ItemToItemJpaConverter;
 import com.ivanskodje.dependency.demo.dependencydemo.service.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Primary
 @Component
 @RequiredArgsConstructor
 public class ItemRepositoryAdapter implements ItemRepository {
@@ -31,6 +33,11 @@ public class ItemRepositoryAdapter implements ItemRepository {
         ItemJpaEntity itemJpaEntity = itemToItemJpaConverter.convert(item);
         assert itemJpaEntity != null;
         itemJpaRepository.save(itemJpaEntity);
+    }
+
+    @Override
+    public void deleteAll() {
+        itemJpaRepository.deleteAll();
     }
 
     private void throwExceptionIfItemAlreadyExist(Item item) {
