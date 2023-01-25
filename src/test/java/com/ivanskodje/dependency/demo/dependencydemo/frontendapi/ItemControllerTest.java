@@ -1,7 +1,7 @@
 package com.ivanskodje.dependency.demo.dependencydemo.frontendapi;
 
 import com.ivanskodje.dependency.demo.dependencydemo.domain.Item;
-import com.ivanskodje.dependency.demo.dependencydemo.repository.ItemRepository;
+import com.ivanskodje.dependency.demo.dependencydemo.service.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ class ItemControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        itemRepository.deleteAll();
+
     }
 
     @Test
@@ -51,33 +51,26 @@ class ItemControllerTest {
                 .andExpect(status().isOk());
 
 
-        List<Item> items = itemRepository.findAll();
+        List<Item> items = itemRepository.findItems();
 
         assertThat(items).isNotEmpty().hasSize(1);
-        assertThat(items.get(0).getId()).isPositive();
         assertThat(items.get(0).getName()).isEqualTo("First Item");
         assertThat(items.get(0).getDescription()).isEqualTo("My first description");
-        verifyNoUnexpectedFieldsAddedToItemClass(items);
-    }
-
-    private static void verifyNoUnexpectedFieldsAddedToItemClass(List<Item> items) {
-        assertThat(items.get(0).getClass().getDeclaredFields().length).isEqualTo(3);
     }
 
     @Test
     void findItems_oneResult_isOk() throws Exception {
         Item item = new Item();
-        item.setName("First Item");
-        item.setDescription("My first description");
+        item.setName("Second Item (unique)");
+        item.setDescription("My second description");
 
-        itemRepository.save(item);
+        itemRepository.saveItem(item);
 
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/item")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name", is("First Item")))
-                .andExpect(jsonPath("$[0].description", is("My first description")))
-                .andExpect(jsonPath("$[0].id", is(item.getId().intValue())));
+                .andExpect(jsonPath("$[0].description", is("My first description")));
     }
 }

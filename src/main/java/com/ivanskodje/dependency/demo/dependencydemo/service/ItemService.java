@@ -1,7 +1,6 @@
 package com.ivanskodje.dependency.demo.dependencydemo.service;
 
 import com.ivanskodje.dependency.demo.dependencydemo.domain.Item;
-import com.ivanskodje.dependency.demo.dependencydemo.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,11 +12,11 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
 
-    public void saveItem(Item item){
-        itemRepository.save(item);
+    public void saveItem(Item item) {
+        itemRepository.saveItem(item);
     }
 
-    public List<Item> findAll() {
-        return itemRepository.findAll();
+    public List<Item> findItems() {
+        return itemRepository.findItems();
     }
 }

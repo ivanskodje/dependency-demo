@@ -6,21 +6,16 @@ import lombok.*;
 
 @Getter
 @Setter
-@Entity(name = "item")
 @NoArgsConstructor
 public class Item {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
 
-    @Column(name = "name")
+    // Name is unique, and what we happened to choose as our domain/business identifier
+    // (we dont know anything about what databases use, and we dont care)
     private String name;
 
-    @Column(name = "description")
     private String description;
 
-    public Item(Long id, String name, String description) {
-        this.id = id;
+    public Item(String name, String description) {
         this.name = name;
         this.description = description;
     }
