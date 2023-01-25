@@ -6,10 +6,8 @@ import lombok.*;
 
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity(name = "item")
+@NoArgsConstructor
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -20,4 +18,10 @@ public class Item {
 
     @Column(name = "description")
     private String description;
+
+    public Item(Long id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
 }

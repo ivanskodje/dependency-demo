@@ -44,6 +44,7 @@ class ItemControllerTest {
                 }
                 """;
 
+
         mockMvc.perform(MockMvcRequestBuilders.post("/api/item")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBody))
@@ -65,11 +66,12 @@ class ItemControllerTest {
 
     @Test
     void findItems_oneResult_isOk() throws Exception {
-        Item item = Item.builder()
-                .name("First Item")
-                .description("My first description")
-                .build();
+        Item item = new Item();
+        item.setName("First Item");
+        item.setDescription("My first description");
+
         itemRepository.save(item);
+
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/item")
                         .contentType(MediaType.APPLICATION_JSON))
