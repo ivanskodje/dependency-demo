@@ -1,12 +1,7 @@
 package com.ivanskodje.dependency.demo.dependencydemo.frontendapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ivanskodje.dependency.demo.dependencydemo.domain.Item;
 import com.ivanskodje.dependency.demo.dependencydemo.repository.ItemRepository;
-import com.ivanskodje.dependency.demo.dependencydemo.service.ItemService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +11,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -34,27 +30,24 @@ class ItemControllerTest {
     @Autowired
     private ItemRepository itemRepository;
 
-    ObjectMapper objectMapper = new ObjectMapper();
-
     @BeforeEach
     public void beforeEach() {
         itemRepository.deleteAll();
     }
 
-
     @Test
     void saveItem_isOk() throws Exception {
-        Item item = Item.builder()
-                .name("First Item")
-                .description("My first description")
-                .build();
-        String jsonBody = objectMapper.writeValueAsString(item);
-
+        String jsonBody = """
+                {
+                    "name": "First Item",
+                    "description": "My first description"
+                }
+                """;
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/item")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonBody))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isOk());
 
 
         List<Item> items = itemRepository.findAll();
@@ -63,6 +56,11 @@ class ItemControllerTest {
         assertThat(items.get(0).getId()).isPositive();
         assertThat(items.get(0).getName()).isEqualTo("First Item");
         assertThat(items.get(0).getDescription()).isEqualTo("My first description");
+        verifyNoUnexpectedFieldsAddedToItemClass(items);
+    }
+
+    private static void verifyNoUnexpectedFieldsAddedToItemClass(List<Item> items) {
+        assertThat(items.get(0).getClass().getDeclaredFields().length).isEqualTo(3);
     }
 
     @Test
@@ -73,18 +71,11 @@ class ItemControllerTest {
                 .build();
         itemRepository.save(item);
 
-
-        String jsonResponse = mockMvc.perform(MockMvcRequestBuilders.get("/api/item")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/item")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn().getResponse().getContentAsString();
-
-
-        List<Item> items = objectMapper.readValue(jsonResponse, new TypeReference<List<Item>>() {        });
-
-        assertThat(items).isNotEmpty().hasSize(1);
-        assertThat(items.get(0).getId()).isPositive();
-        assertThat(items.get(0).getName()).isEqualTo("First Item");
-        assertThat(items.get(0).getDescription()).isEqualTo("My first description");
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name", is("First Item")))
+                .andExpect(jsonPath("$[0].description", is("My first description")))
+                .andExpect(jsonPath("$[0].id", is(item.getId().intValue())));
     }
-
 }
