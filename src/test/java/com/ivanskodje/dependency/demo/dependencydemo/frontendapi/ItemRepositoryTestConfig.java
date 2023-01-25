@@ -13,6 +13,7 @@ public class ItemRepositoryTestConfig {
     @Bean
     @Qualifier("itemPrinterAdapter")
     public ItemRepository itemRepository() {
+        // Demonstrates how easy it is to change entire components in our system
         return new ItemPrinterAdapter();
     }
 }
