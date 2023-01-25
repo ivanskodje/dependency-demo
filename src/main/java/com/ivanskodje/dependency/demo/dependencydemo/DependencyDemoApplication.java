@@ -9,5 +9,4 @@ public class DependencyDemoApplication {
     public static void main(String[] args) {
         SpringApplication.run(DependencyDemoApplication.class, args);
     }
-
 }
